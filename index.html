@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sweet Treat Journey</title>
+  <style>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&display=swap" rel="stylesheet">
+
+body, .modal, button {
+  font-family: "Playfair Display", "Segoe UI", "Arial", serif;
+}
+
+    body {
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      height: 100vh;
+      background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #fecfef 100%);
+      overflow-x: hidden;
+    }
+
+    .game-container {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+    }
+
+    .path {
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
+
+    .stage {
+      position: absolute;
+      background: none;
+      border: none;
+      padding: 0;
+      margin: 0;
+      font-size: 50px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+      z-index: 5;
+    }
+
+    .stage:hover {
+      transform: scale(1.2);
+      filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.4));
+    }
+
+    .stage.locked {
+      cursor: not-allowed;
+      opacity: 0.4;
+      filter: grayscale(100%) drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+    }
+
+    .avatar {
+      position: absolute;
+      width: 76px;
+      height: 93px;
+      text-align: center;
+      line-height: 118px;
+      transition: all 1.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      z-index: 10;
+      pointer-events: none;
+      filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+    }
+
+    .avatar.moving {
+      animation: bounce 0.3s infinite;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    .controls {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1001;
+    }
+
+    button {
+      padding: 13px 19px;
+      font-size: 21px;
+      border: none;
+      border-radius: 99px;
+      background: linear-gradient(45deg, #ff69b4, #ff1493);
+      color: white;
+      cursor: pointer;
+      font-weight: bold;
+      transition: all 0.3s ease;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+    }
+
+    button:disabled {
+      background: #888;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .modal {
+      position: fixed;
+      top: 0; 
+      left: 0;
+      width: 100%; 
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+
+    .modal-content {
+      background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+      padding: 30px;
+      border-radius: 20px;
+      max-width: 350px;
+      text-align: center;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+      border: 3px solid white;
+      animation: modalPop 0.5s ease-out;
+    }
+
+    @keyframes modalPop {
+      0% { transform: scale(0.5); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    .modal-content p {
+      font-size: 18px;
+      margin-bottom: 20px;
+      color: #333;
+      line-height: 1.5;
+    }
+
+    .modal-content button {
+      background: linear-gradient(45deg, #ff1493, #ff69b4);
+      margin-top: 10px;
+    }
+
+    .food-bg {
+      position: fixed;
+      font-size: 40px;
+      animation: float 4s ease-in-out infinite;
+      opacity: 0.3;
+      z-index: 1;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-15px) rotate(10deg); }
+    }
+
+    .emoji-line {
+      position: absolute;
+      font-size: 28px;
+      pointer-events: none;
+      z-index: 2;
+      animation: sparkle 2s infinite alternate;
+    }
+
+    @keyframes sparkle {
+      0% { transform: translateY(0) scale(1); opacity: 0.6; }
+      50% { transform: translateY(-3px) scale(1.1); opacity: 1; }
+      100% { transform: translateY(0) scale(1); opacity: 0.6; }
+    }
+
+    .top-text {
+  position: absolute;
+  top: 34px;         /* distance from top */
+  left: 37%;         
+  transform: translateX(-15%); /* centers horizontally */
+  font-size: 11px;   /* adjust size */
+  color: rgba(146, 27, 62, 0.69);        /* change color as you like */
+  pointer-events: none; /* so it won’t block clicks */
+}
+
+  </style>
+</head>
+<body>
+
+<div class="top-text"><h1>Birthday Map Sayang</h1><h1 style="justify-self: center;">🎀🫶🏻💓</h1></div>
+
+  <div class="game-container">
+    <!-- Food background -->
+
+    <div class="food-bg" style="top: 10%; left: 5%; animation-delay: 0s;">🍰</div>
+    <div class="food-bg" style="top: 15%; right: 8%; animation-delay: 1s;">🧁</div>
+    <div class="food-bg" style="top: 24%; left: 15%; animation-delay: 2s;">🍩</div>
+    <div class="food-bg" style="top: 35%; right: 26%; animation-delay: 0.5s;">🍕</div>
+    <div class="food-bg" style="top: 45%; left: 8%; animation-delay: 1.5s;">🎂</div>
+    <div class="food-bg" style="top: 46%; right: 12%; animation-delay: 3s;">🥟</div>
+    <div class="food-bg" style="top: 66%; left: 12%; animation-delay: 0.6s;">🍣</div>
+    <div class="food-bg" style="top: 68%; right: 15%; animation-delay: 1.8s;">🧁</div>
+    <div class="food-bg" style="top: 26%; right: 15%; animation-delay: 1.8s;">🍵</div>
+    <div class="food-bg" style="top: 79%; right: 55%; animation-delay: 1.8s;">🥑</div>
+    <div class="food-bg" style="top: 54%; right: 55%; animation-delay: 1.8s;">🌮</div>
+
+    <div class="path" id="game">
+      <!-- Emoji dotted line will be generated via JS -->
+
+      <button class="stage" id="stage1" style="bottom: 100px; left: 70%;" onclick="showStageInfo(1)">🏠</button>
+      <button class="stage" id="stage2" style="bottom: 200px; left: 25%;" onclick="showStageInfo(2)">🎂</button>
+      <button class="stage" id="stage3" style="bottom: 300px; left: 70%;" onclick="showStageInfo(3)">🐟</button>
+      <button class="stage" id="stage4" style="bottom: 400px; left: 25%;" onclick="showStageInfo(4)">💌</button>
+      <button class="stage" id="stage5" style="bottom: 525px; left: 50%;" onclick="showStageInfo(5)">🎁</button>
+
+      <img id="avatar" class="avatar" src="asset/peace.png" alt="avatar" style="bottom: 105px; left: 59%;" />
+    </div>
+  </div>
+
+  <div class="controls">
+    <button id="nextBtn">LETS GO</button>
+  </div>
+
+  <div class="modal" id="wishModal">
+    <div class="modal-content">
+      <p>🎂 Happy Birthday, my love! 🎉<br><br>
+      🌟 You've completed your sweet treat journey! 🌟<br><br>
+      May your life be filled with joy, laughter, and endless sweet moments! 🍩🍓🧁💕</p>
+      <button onclick="closeModal()">Hope you have fun!</button>
+    </div>
+  </div>
+
+  <div class="modal" id="stageModal">
+    <div class="modal-content">
+      <h2 id="stageTitle" style="margin-top: 0; color: #ff1493; font-size: 24px;"></h2>
+      <p id="stageDescription" style="font-size: 18px; line-height: 1.6;"></p>
+      <button onclick="closeStageModal()">LETS GOOO</button>
+    </div>
+  </div>
+
+  <script>
+    const avatar = document.getElementById("avatar");
+    const nextBtn = document.getElementById("nextBtn");
+    const stages = [
+      { bottom: 100, left: 70 },
+      { bottom: 200, left: 30 },
+      { bottom: 300, left: 70 },
+      { bottom: 400, left: 30 },
+      { bottom: 525, left: 50 }
+    ];
+    
+    let currentStage = 0;
+
+    const stageInfo = {
+      1: { title: "🏠 Home Sweet Home", description: "Deanna's House, Vroom Vroom!" },
+      2: { title: "🎂 Cake or be Caked ?", description: "Birthday law: no escape from cake! 🎉 Will it be a slice of heaven, or will we get frosted alive? 🧁😏" },
+      3: { title: "🐟 Neptune Showdown",  description: "We set sail for Neptune’s castle, where the grand feast awaits. It’s a battle of bites, eat or be eaten (no pun intended)! 🦀🐙🦞"},
+      4: { title: "💌 Letter to Lovely Sayang", description: "Sayang,\n      They say love should be effortless, like breathing, like floating.\nBut with you, I don’t want effortless.\n\nI want to bear the weight of your love, to hold it close, even tremble under it.\nOn your birthday, I want you to know: I don’t want an easy love with you.\n\nI want a love that matters, one we choose, one we build, one that will always be worth it.\n\nHappy Birthday, my most important love.\n\nAlways,\nHakimi"},
+      5: { title: "🎁 Surprises", description: "Not just any treasure… something shiny awaits! ✨ Will it fit like destiny, or sparkle brighter than dessert? 💎" }
+
+
+    };
+
+
+
+function showStageInfo(stageNumber) {
+  const info = stageInfo[stageNumber];
+  document.getElementById('stageTitle').textContent = info.title;
+  document.getElementById('stageDescription').innerHTML = info.description.replace(/\n/g, "<br>");
+  document.getElementById('stageModal').style.display = 'flex';
+
+  // Hide the MOVE button when modal opens
+  nextBtn.style.display = "none";
+}
+
+function closeStageModal() {
+  document.getElementById('stageModal').style.display = 'none';
+
+  // Show the MOVE button again when modal closes
+  nextBtn.style.display = "inline-block";
+}
+
+function goToStage(stageIndex) {
+  // Unlock stages up to currentStage+1
+  for (let i = 0; i < stages.length; i++) {
+    const btn = document.getElementById("stage"+(i+1));
+    if (i <= stageIndex) {
+      btn.classList.remove("locked");
+      btn.disabled = false;   // ✅ make clickable
+    } else {
+      btn.classList.add("locked");
+      btn.disabled = true;    // ✅ block clicks
+    }
+  }
+
+  currentStage = stageIndex;
+
+  avatar.src = "asset/run.png";
+  avatar.classList.add("moving");
+  avatar.style.bottom = stages[currentStage].bottom + "px";
+  avatar.style.left = stages[currentStage].left + "%";
+
+  setTimeout(() => {
+    avatar.src = "asset/peace.png";
+    avatar.classList.remove("moving");
+  }, 1500);
+
+  nextBtn.textContent = currentStage === stages.length -1 ? "open me! " : "MOVE";
+}
+
+// Initialize stage locks (all locked except stage1)
+for (let i = 1; i < stages.length; i++) {
+  const btn = document.getElementById("stage"+(i+1));
+  btn.classList.add("locked");
+  btn.disabled = true;  // ✅ block clicks
+}
+
+
+    nextBtn.addEventListener("click", () => {
+      if (currentStage < stages.length - 1) {
+        goToStage(currentStage + 1);
+      } else {
+        document.getElementById("wishModal").style.display = "flex";
+        nextBtn.disabled = true;
+      }
+    });
+
+function closeModal() {
+  document.getElementById("wishModal").style.display = "none";
+  currentStage = 0;
+  avatar.style.bottom = stages[0].bottom + "px";
+  avatar.style.left = stages[0].left + "%";
+  avatar.src = "asset/peace.png";
+  nextBtn.textContent = "MOVE";
+  nextBtn.disabled = false;
+  
+  for (let i = 0; i < stages.length; i++) {
+    document.getElementById("stage"+(i+1)).classList.toggle("locked", i > 0);
+  }
+
+  // Show the MOVE button again when modal closes
+  nextBtn.style.display = "inline-block";
+}
+
+    // Generate emoji dotted lines
+    const gameDiv = document.getElementById("game");
+    for (let i = 0; i < stages.length - 1; i++) {
+      const start = stages[i];
+      const end = stages[i+1];
+      const steps = 2; // number of emojis between stages
+      for (let j = 1; j <= steps; j++) {
+        const div = document.createElement("div");
+        div.className = "emoji-line";
+        div.textContent = "✨";
+        div.style.bottom = start.bottom + ((end.bottom - start.bottom) / (steps+1))*j + "px";
+        div.style.left = start.left + ((end.left - start.left) / (steps+1))*j + "%";
+        gameDiv.appendChild(div);
+      }
+    }
+  </script>
+</body>
+</html>
